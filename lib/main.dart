@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:my_project/home_page.dart';
-import 'package:my_project/login_page.dart';
-import 'package:my_project/profile_page.dart';
-import 'package:my_project/registration_page.dart';
+import 'package:my_project/ui/home_page.dart';
+import 'package:my_project/ui/login_page.dart';
+import 'package:my_project/ui/profile_page.dart';
+import 'package:my_project/ui/registration_page.dart';
 
 void main() {
   runApp(const MyApp());

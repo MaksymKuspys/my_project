@@ -8,11 +8,11 @@ class ProgressOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final int totalLabs = subjects.fold(0,
-            (sum, item) => sum + item.totalLabs,);
-    final int completedLabs = subjects.fold(0,
-            (sum, item) => sum + item.completedLabs,);
-    final int pendingLabs = totalLabs - completedLabs;
+    final totalLabs = subjects
+        .fold(0, (sum, subject) => sum + subject.totalLabs);
+    final completedLabs = subjects
+        .fold(0, (sum, subject) => sum + subject.completedLabs);
+    final pendingLabs = totalLabs - completedLabs;
     final double completionRate = totalLabs > 0 ? completedLabs / totalLabs : 0;
 
     return Column(
@@ -22,13 +22,13 @@ class ProgressOverview extends StatelessWidget {
           'Labs Progress',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         LinearProgressIndicator(
           value: completionRate,
           backgroundColor: Colors.grey[300],
           color: Colors.blue,
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         Text('Completed: $completedLabs Labs'),
         Text('Pending: $pendingLabs Labs'),
       ],
