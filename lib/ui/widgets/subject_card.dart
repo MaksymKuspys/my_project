@@ -3,15 +3,15 @@ import 'package:my_project/entity/subject.dart';
 
 class SubjectCard extends StatelessWidget {
   final Subject subject;
-  final VoidCallback onIncrement;
-  final VoidCallback onDecrement;
-  final VoidCallback onRemove;
+  final VoidCallback incrementLabs;
+  final VoidCallback decrementLabs;
+  final VoidCallback removeSubject;
 
   const SubjectCard({
     required this.subject,
-    required this.onIncrement,
-    required this.onDecrement,
-    required this.onRemove,
+    required this.incrementLabs,
+    required this.decrementLabs,
+    required this.removeSubject,
     super.key,
   });
 
@@ -31,8 +31,9 @@ class SubjectCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             LinearProgressIndicator(
-              value: subject.totalLabs > 0 ? subject.completedLabs
-                  / subject.totalLabs : 0,
+              value: subject.totalLabs > 0
+                  ? subject.completedLabs / subject.totalLabs
+                  : 0,
               backgroundColor: Colors.grey[300],
               color: Colors.green,
             ),
@@ -45,15 +46,15 @@ class SubjectCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton(
-                  onPressed: onIncrement,
+                  onPressed: incrementLabs,
                   child: const Text('+'),
                 ),
                 ElevatedButton(
-                  onPressed: onDecrement,
+                  onPressed: decrementLabs,
                   child: const Text('-'),
                 ),
                 ElevatedButton(
-                  onPressed: onRemove,
+                  onPressed: removeSubject,
                   child: const Text('X', style: TextStyle(color: Colors.red)),
                 ),
               ],

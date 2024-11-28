@@ -3,6 +3,7 @@ import 'package:my_project/entity/user.dart';
 import 'package:my_project/repository/shared/shared_prefs_current_user_repository.dart';
 import 'package:my_project/repository/shared/shared_prefs_user_repository.dart';
 import 'package:my_project/service/user_service.dart';
+import 'package:my_project/ui/widgets/logout_confirmation_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -66,7 +67,9 @@ class ProfilePageState extends State<ProfilePage> {
               child: const Text('Save'),
             ),
             TextButton(
-              onPressed: _logout,
+              onPressed: () {
+                showLogoutConfirmationDialog(context, _logout);
+              },
               child: const Text('Logout'),
             ),
           ],

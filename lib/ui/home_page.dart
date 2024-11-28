@@ -5,6 +5,7 @@ import 'package:my_project/repository/shared/shared_prefs_current_user_repositor
 import 'package:my_project/repository/shared/shared_prefs_subject_repository.dart';
 import 'package:my_project/repository/shared/shared_prefs_user_repository.dart';
 import 'package:my_project/repository/user_repository.dart';
+import 'package:my_project/service/connectivity_service.dart';
 import 'package:my_project/service/subject_service.dart';
 import 'package:my_project/service/user_service.dart';
 import 'package:my_project/ui/widgets/add_subject_form.dart';
@@ -28,14 +29,10 @@ class HomePageState extends State<HomePage> {
   CurrentUserRepository? _currentUserRepository;
   UserRepository? _userRepository;
   SubjectService? _subjectService;
+  ConnectivityService? _connectivityService;
   UserService? _userService;
-  List<Subject> _subjects = [];
 
-  @override
-  void initState() {
-    super.initState();
-    _initializeAndLoadSubjects();
-  }
+  List<Subject> _subjects = [];
 
   Future<void> _initializeServices() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -44,6 +41,9 @@ class HomePageState extends State<HomePage> {
     _userRepository = SharedPrefsUserRepository(prefs);
     _subjectService = SubjectService(_subjectRepository!);
     _userService = UserService(_userRepository!, _currentUserRepository!);
+    if (mounted) {
+      _connectivityService = ConnectivityService(context);
+    }
   }
 
   Future<void> _initializeAndLoadSubjects() async {
@@ -51,12 +51,16 @@ class HomePageState extends State<HomePage> {
     await _loadSubjects();
   }
 
-  Future<void> _loadSubjects() async {
-    final subjects = await _subjectService!.getSubjects(
-      (await _userService?.getCurrentUser())!.id,);
-    setState(() {
-      _subjects = subjects;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _initializeAndLoadSubjects();
+  }
+
+  @override
+  void dispose() {
+    _connectivityService?.dispose();
+    super.dispose();
   }
 
   @override
@@ -76,17 +80,21 @@ class HomePageState extends State<HomePage> {
               subjectController: _subjectController,
               totalLabsController: _totalLabsController,
               completedLabsController: _completedLabsController,
-              onAdd: _addSubject,
+              addSubject: _addSubject,
             ),
             Expanded(
               child: ListView.builder(
                 itemCount: _subjects.length,
-                itemBuilder: (context, index) => SubjectCard(
-                  subject: _subjects[index],
-                  onIncrement: () => _incrementCompletedLabs(_subjects[index]),
-                  onDecrement: () => _decrementCompletedLabs(_subjects[index]),
-                  onRemove: () => _removeSubject(_subjects[index]),
-                ),
+                itemBuilder: (context, index) =>
+                    SubjectCard(
+                      subject: _subjects[index],
+                      incrementLabs: () =>
+                          _incrementCompletedLabs(_subjects[index]),
+                      decrementLabs: () =>
+                          _decrementCompletedLabs(_subjects[index]),
+                      removeSubject: () =>
+                          _removeSubject(_subjects[index]),
+                    ),
               ),
             ),
           ],
@@ -99,6 +107,14 @@ class HomePageState extends State<HomePage> {
     );
   }
 
+  Future<void> _loadSubjects() async {
+    final subjects = await _subjectService!.getSubjects(
+        (await _userService?.getCurrentUser())!.id,);
+    setState(() {
+      _subjects = subjects;
+    });
+  }
+
   Future<void> _addSubject() async {
     final name = _subjectController.text.trim();
     final totalLabs = int.tryParse(_totalLabsController.text.trim()) ?? 0;
@@ -107,8 +123,8 @@ class HomePageState extends State<HomePage> {
 
     if (name.isNotEmpty && totalLabs > 0) {
       final subject = Subject(const Uuid().v4(),
-        name, totalLabs, completedLabs,
-        (await _userService?.getCurrentUser())!.id,);
+          name, totalLabs, completedLabs,
+          (await _userService?.getCurrentUser())!.id,);
       await _subjectService!.addSubject(subject);
       _loadSubjects();
       _clearSubjectForm();

@@ -4,13 +4,14 @@ class AddSubjectForm extends StatelessWidget {
   final TextEditingController subjectController;
   final TextEditingController totalLabsController;
   final TextEditingController completedLabsController;
-  final VoidCallback onAdd;
+  final VoidCallback addSubject;
 
   const AddSubjectForm({
     required this.subjectController,
     required this.totalLabsController,
     required this.completedLabsController,
-    required this.onAdd, super.key,
+    required this.addSubject,
+    super.key,
   });
 
   @override
@@ -34,7 +35,7 @@ class AddSubjectForm extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         ElevatedButton(
-          onPressed: onAdd,
+          onPressed: addSubject,
           child: const Text('Add Subject'),
         ),
       ],
