@@ -8,6 +8,7 @@ import 'package:my_project/repository/user_repository.dart';
 import 'package:my_project/service/connectivity_service.dart';
 import 'package:my_project/service/subject_service.dart';
 import 'package:my_project/service/user_service.dart';
+import 'package:my_project/service/news_service.dart'; // Import NewsService
 import 'package:my_project/ui/widgets/add_subject_form.dart';
 import 'package:my_project/ui/widgets/progress_overview.dart';
 import 'package:my_project/ui/widgets/subject_card.dart';
@@ -32,7 +33,10 @@ class HomePageState extends State<HomePage> {
   ConnectivityService? _connectivityService;
   UserService? _userService;
 
+  NewsService _newsService = NewsService(); // Initialize NewsService
+
   List<Subject> _subjects = [];
+  List<String> _educationalNews = []; // List to store educational news
 
   Future<void> _initializeServices() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -49,6 +53,7 @@ class HomePageState extends State<HomePage> {
   Future<void> _initializeAndLoadSubjects() async {
     await _initializeServices();
     await _loadSubjects();
+    await _fetchEducationalNews(); // Fetch the news when initializing
   }
 
   @override
@@ -95,6 +100,21 @@ class HomePageState extends State<HomePage> {
                       removeSubject: () =>
                           _removeSubject(_subjects[index]),
                     ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Educational News',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _educationalNews.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(_educationalNews[index]),
+                  );
+                },
               ),
             ),
           ],
@@ -168,5 +188,17 @@ class HomePageState extends State<HomePage> {
   Future<void> _removeSubject(Subject subject) async {
     await _subjectRepository!.deleteSubject(subject);
     _loadSubjects();
+  }
+
+  // Fetch educational news
+  Future<void> _fetchEducationalNews() async {
+    try {
+      final news = await _newsService.fetchEducationalNews();
+      setState(() {
+        _educationalNews = news;
+      });
+    } catch (e) {
+      print('Error fetching educational news: $e');
+    }
   }
 }
